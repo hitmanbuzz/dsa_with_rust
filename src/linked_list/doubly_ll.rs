@@ -103,6 +103,68 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone + std::fmt::Display> Doub
             current = node.borrow_mut().next.clone();
         } 
     }
+    
+    /// Insert a node/data with that index
+    /// 
+    /// args:
+    /// * `index`: Index where the node/data will be inserted
+    /// 
+    /// * `data`: The node/data to push inserted to the `index`
+    fn insert_at_index(&mut self, index: u32, data: &'a T) {
+        self.is_empty();
+        
+        if index > self.get_length() - 1 {
+            println!("Index out of range");
+            return;
+        }
+
+        let mut current = self.head.clone();
+        let mut index_counter = 0;
+
+        while let Some(node) = current {
+            if index_counter == index {
+                let new_node = Rc::new(RefCell::new(Node {
+                    data,
+                    next: node.borrow().next.clone(),
+                    prev: node.borrow().prev.clone(), 
+                }));
+                
+                node.borrow_mut().next = Some(new_node);
+            }
+
+            current = node.borrow().next.clone();
+            index_counter += 1;
+        } 
+    }
+    
+    /// Delete the front node of the list
+    fn delete_front(&mut self) {
+        self.is_empty();
+        
+        if self.get_length() == 1 {
+            self.head = None;
+            self.tail = None;
+        }
+
+        self.head = self.head.clone().unwrap().borrow().next.clone();
+    }
+    
+    /// Delete the back/end node of the list
+    fn delete_back(&mut self) {
+        self.is_empty();
+
+        if self.get_length() == 1 {
+            self.head = None;
+            self.tail = None; 
+        }
+
+        if let Some(tail_node) = &self.tail.clone() {
+            if let Some(prev_node) = &tail_node.borrow().prev {
+                prev_node.borrow_mut().next = None;
+                self.tail = Some(Rc::clone(prev_node));
+            }
+        }
+    }
 
     /// Finding a node/data in a list and return the index of the node from the list
     /// 
@@ -156,6 +218,13 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone + std::fmt::Display> Doub
             println!("List is empty");
         }
     }
+
+    fn is_empty(&self) {
+        if self.head.is_none() {
+            println!("List is empty");
+            return;
+        }
+    }
 }
 
 
@@ -190,4 +259,15 @@ pub fn run() {
     
 
     println!("List Length: {}", doubly_ll.get_length());
+    
+    doubly_ll.delete_front();
+    doubly_ll.display();
+    
+    doubly_ll.delete_front();
+    doubly_ll.display();
+    
+    println!("---Delete Back---");
+
+    doubly_ll.delete_back(); 
+    doubly_ll.display();
 }
