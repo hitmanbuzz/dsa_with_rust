@@ -50,6 +50,30 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone> DoublyLinkedList<'a, T> 
         }
     }
 
+    /// Push a new node to the back of the list
+    /// 
+    /// Will create a new node with the given data and add it to the end of the list
+    /// 
+    /// args:
+    /// * `data`: The data to be added to the list
+    fn push_back(&mut self, data: &'a T) {
+       if self.head.is_none() {
+            println!("List is empty");
+            return;
+        }
+        if let Some(tail) = &self.tail {
+            let new_node = Rc::new(RefCell::new(Node {
+                data, // Placeholder data
+                next: None,
+                prev: Some(tail.clone())
+            }));
+            
+            tail.borrow_mut().next = Some(new_node.clone());
+            self.tail = Some(new_node);
+        }
+    }
+
+    /// Display the list
     fn display(&self) {
         let mut current = self.head.clone();
         while let Some(node) = current {
@@ -57,6 +81,15 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone> DoublyLinkedList<'a, T> 
             current = node.borrow().next.clone();
         }
         println!();
+    }
+    
+    /// Get the value of the tail node
+    fn get_tail_value(&self) {
+        if let Some(tail) = &self.tail {
+            println!("Tail value: {:?}", tail.borrow().data);
+        } else {
+            println!("List is empty");
+        }
     }
 }
 
@@ -72,4 +105,14 @@ pub fn run() {
     doubly_ll.push_front(&40);
 
     doubly_ll.display();
+    
+    doubly_ll.push_back(&50);
+    doubly_ll.push_back(&60);
+    doubly_ll.display();
+    doubly_ll.get_tail_value();
+    
+    doubly_ll.push_back(&70);
+    doubly_ll.push_back(&80);
+    doubly_ll.display();
+    doubly_ll.get_tail_value();
 }
