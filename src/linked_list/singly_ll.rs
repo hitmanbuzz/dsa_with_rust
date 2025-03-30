@@ -8,6 +8,7 @@ struct SinglyLinkedList<'a, T> {
     head: Option<Box<Node<'a, T>>>
 }
 
+#[allow(dead_code)]
 impl<'a, T: std::fmt::Debug + PartialEq> SinglyLinkedList<'a, T> {
     /// Create a new singly linked list
     /// 
@@ -239,6 +240,7 @@ impl<'a, T: std::fmt::Debug + PartialEq> SinglyLinkedList<'a, T> {
     }
 }
 
+#[allow(dead_code)]
 /// Run the program
 pub fn run() {
     let mut singly_ll = SinglyLinkedList::new();
