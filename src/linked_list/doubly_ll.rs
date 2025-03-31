@@ -165,6 +165,69 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone + std::fmt::Display> Doub
             }
         }
     }
+    
+    /// Delete a specific node from the list
+    /// 
+    /// args:
+    /// * `data`: The node/data to be deleted if found in the list
+    fn delete_at_node(&mut self, data: &'a T) {
+        self.is_empty();
+
+        if self.head.as_ref().unwrap().borrow().data == data {
+            self.delete_front();
+            return;
+        }
+        
+        if self.tail.as_ref().unwrap().borrow().data == data {
+            self.delete_back();
+            return;
+        }
+
+        let mut current = self.head.clone();
+        
+        while let Some(current_node) = current {
+            // Get the next node outside of a borrow scope
+            let next = {
+                let current_ref = current_node.borrow();
+                match &current_ref.next {
+                    Some(next_node) => {
+                        // Check if this is the node to delete
+                        if next_node.borrow().data == data {
+                            // Found the target node
+                            Some(next_node.clone())
+                        } else {
+                            // Not the target, continue searching
+                            None
+                        }
+                    },
+                    None => None
+                }
+            };
+            
+            // If we found the node to delete
+            if let Some(node_to_delete) = next {
+                // Get references to relevant nodes
+                let next_next = node_to_delete.borrow().next.clone();
+                
+                // Update pointers - done in separate scopes to avoid multiple borrows
+                {
+                    current_node.borrow_mut().next = next_next.clone();
+                }
+                
+                if let Some(next_next_ref) = next_next {
+                    next_next_ref.borrow_mut().prev = Some(current_node.clone());
+                }
+                
+                return; // Node deleted
+            }
+            
+            // Move to the next node
+            let next = current_node.borrow().next.clone();
+            current = next;
+        }
+        
+        println!("Node with data {} not found in the list", &data);
+    }
 
     /// Finding a node/data in a list and return the index of the node from the list
     /// 
@@ -219,11 +282,59 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone + std::fmt::Display> Doub
         }
     }
 
+    
+    /// check if list is empty without any return type like bool
+    /// 
+    /// Will be used for fast checking
     fn is_empty(&self) {
         if self.head.is_none() {
             println!("List is empty");
             return;
         }
+    }
+    
+    /// Reverse a doubly linked list
+    fn reverse(&mut self) {
+        self.is_empty();
+
+        // Handle single node
+        if self.head.as_ref().unwrap().borrow().next.is_none() {
+            return;
+        }
+        
+        // Save old head and tail
+        let old_head = self.head.clone();
+        let old_tail = self.tail.clone();
+        
+        // Start at the head
+        let mut current = old_head.clone();
+        
+        // Keep track of the previous node (in new direction)
+        let mut prev = None;
+        
+        // Iterate through the list
+        while let Some(current_ref) = current.clone() {
+            // Get the next node before we change any pointers
+            let next = {
+                let borrowed = current_ref.borrow();
+                borrowed.next.clone()
+            };
+            
+            // Update the current node's pointers
+            {
+                let mut current_mut = current_ref.borrow_mut();
+                current_mut.next = prev.clone();
+                current_mut.prev = next.clone();
+            }
+            
+            // Move forward: current becomes prev, next becomes current
+            prev = Some(current_ref);
+            current = next;
+        }
+        
+        // Update head and tail
+        self.head = old_tail;
+        self.tail = old_head;
     }
 }
 
@@ -269,5 +380,17 @@ pub fn run() {
     println!("---Delete Back---");
 
     doubly_ll.delete_back(); 
+    doubly_ll.display();
+    
+
+    println!("---Delete at node---");
+
+    doubly_ll.delete_at_node(&60);
+    doubly_ll.display();
+    
+    doubly_ll.delete_at_node(&10);
+    doubly_ll.display();
+
+    doubly_ll.reverse();
     doubly_ll.display();
 }
