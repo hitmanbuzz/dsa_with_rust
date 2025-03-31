@@ -1,6 +1,6 @@
 # Data Structures Implementation Status
 
-- [x] ✅ Linked List (Singly List Only Done | Doubly on the way)
+- [x] ✅ Linked List (Circular & Circular doubly only left)
 - [ ] ❌ Stack
 - [ ] ❌ Queue
 - [ ] ❌ Binary Tree
