@@ -6,6 +6,7 @@ struct Node<'a, T> {
     next: Option<Rc<RefCell<Node<'a, T>>>>,
 }
 
+/// Code structure for the Circular Linked List
 struct CircularLinkedList<'a, T> {
     head: Option<Rc<RefCell<Node<'a, T>>>>,
 }
@@ -17,6 +18,10 @@ impl<'a, T> CircularLinkedList<'a, T> {
         Self { head: None }
     }
 
+    /// Insert a element at the front/start of the list
+    /// 
+    /// args:
+    /// * `data`: the data that will be inserted `(&'a T)`
     fn push_front(&mut self, data: &'a T)
     {
         let new_node = Rc::new(RefCell::new(Node {
@@ -48,6 +53,8 @@ impl<'a, T> CircularLinkedList<'a, T> {
         self.head = Some(new_node);
     }
 
+
+    /// Print all the items/data of the list
     fn display(&self)
     where T: std::fmt::Display
     {
@@ -70,6 +77,9 @@ impl<'a, T> CircularLinkedList<'a, T> {
         }
     }
 
+    /// Check if the list is empty or not
+    /// 
+    /// It doesn't return any type because it is use for instant check
     fn is_empty(&self) {
         if self.head.is_none() {
             println!("Linked List is empty");
@@ -78,6 +88,7 @@ impl<'a, T> CircularLinkedList<'a, T> {
     }
 }
 
+#[allow(dead_code)]
 pub fn run() {
     let mut circular_ll = CircularLinkedList::new();
 
