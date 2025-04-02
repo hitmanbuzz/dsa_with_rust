@@ -338,7 +338,7 @@ impl<'a, T: std::fmt::Debug + PartialEq + Copy + Clone + std::fmt::Display> Doub
     }
 }
 
-
+#[allow(dead_code)]
 /// Run the program
 pub fn run() {
     let mut doubly_ll = DoublyLinkedList::new();
